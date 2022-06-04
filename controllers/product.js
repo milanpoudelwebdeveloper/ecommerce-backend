@@ -1,90 +1,90 @@
-const Product = require("../models/product");
-const User = require("../models/user");
-const slugify = require("slugify");
+const Product = require('../models/product')
+const User = require('../models/user')
+const slugify = require('slugify')
 
 exports.createProduct = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.body)
     //since we are creating slug by ourself from controller, so we are attaching it to req.body so we don't
     //have to send all individual one by one, we have lots of fields coming like price, quantity and lots of
     //so saving req.body is easier
-    req.body.slug = slugify(req.body.title);
-    const product = await new Product(req.body).save();
-    console.log(product);
-    res.status(200).send("Successfully created the product");
+    req.body.slug = slugify(req.body.title)
+    const product = await new Product(req.body).save()
+    console.log(product)
+    res.status(200).send('Successfully created the product')
   } catch (e) {
-    console.log(e);
-    res.status(400).send(e.message);
+    console.log(e)
+    res.status(400).send(e.message)
   }
-};
+}
 
 exports.listProducts = async (req, res) => {
   try {
     let products = await Product.find({})
       //just to convert it into integer we use parseInt
       .limit(parseInt(req.params.count))
-      .populate("category")
-      .populate("subs")
+      .populate('category')
+      .populate('subs')
       //we can also pass array in sort
-      .sort([["createdAt", "desc"]])
-      .exec();
+      .sort([['createdAt', 'desc']])
+      .exec()
     //before we send , we are apply limit and we will populate category and subcategory before sending
 
-    res.status(200).json(products);
+    res.status(200).json(products)
   } catch (e) {
-    console.log(e);
-    res.status(400).send(e.message);
+    console.log(e)
+    res.status(400).send(e.message)
   }
-};
+}
 
 //get single product
 exports.readProduct = async (req, res) => {
   try {
     const product = await Product.findOne({ slug: req.params.slug })
-      .populate("category")
-      .populate("subs")
-      .exec();
-    console.log("Product info", product);
-    res.status(200).json(product);
+      .populate('category')
+      .populate('subs')
+      .exec()
+    console.log('Product info', product)
+    res.status(200).json(product)
   } catch (e) {
-    console.log(e);
+    console.log(e)
     res
       .status(400)
-      .send("Something went wrong while fetching product information");
+      .send('Something went wrong while fetching product information')
   }
-};
+}
 
 exports.updateProduct = async (req, res) => {
   try {
     //when we update the title, slug will also update
     if (req.body.title) {
-      req.body.slug = slugify(req.body.title);
+      req.body.slug = slugify(req.body.title)
     }
     const updated = await Product.findOneAndUpdate(
       { slug: req.params.slug },
       req.body,
       {
-        new: true,
+        new: true
       }
-    ).exec();
-    res.status(200).json(updated);
+    ).exec()
+    res.status(200).json(updated)
   } catch (e) {
-    console.log("Product update failed", e);
-    res.status(400).send("Product update failed");
+    console.log('Product update failed', e)
+    res.status(400).send('Product update failed')
   }
-};
+}
 
 exports.deleteProduct = async (req, res) => {
   try {
-    const deleted = await Product.findOneAndDelete({
-      slug: req.params.slug,
-    }).exec();
-    res.status(200).send("Product deleted successfully");
+    await Product.findOneAndDelete({
+      slug: req.params.slug
+    }).exec()
+    res.status(200).send('Product deleted successfully')
   } catch (e) {
-    console.log(e);
-    res.status(400).send("Something went wrong while deleting product");
+    console.log(e)
+    res.status(400).send('Something went wrong while deleting product')
   }
-};
+}
 
 //without pagination
 // exports.getProducts = async (req, res) => {
@@ -109,54 +109,54 @@ exports.deleteProduct = async (req, res) => {
 //with pagination
 exports.getProducts = async (req, res) => {
   try {
-    const { sort, order, page } = req.body;
-    const currentPage = page || 1;
+    const { sort, order, page } = req.body
+    const currentPage = page || 1
     //in per page how many products we are going to send
-    const productsPerPage = 3;
+    const productsPerPage = 3
     //here skips skips all the products
     //for example if skip(3) then it means it skips the first 3 products
 
     const products = await Product.find({})
       .skip((currentPage - 1) * productsPerPage)
-      .populate("category")
-      .populate("subs")
+      .populate('category')
+      .populate('subs')
       .sort([[sort, order]])
       .limit(productsPerPage)
-      .exec();
-    res.status(200).json(products);
+      .exec()
+    res.status(200).json(products)
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-};
+}
 //getting the total counts of products in the database
 exports.productsCount = async (req, res) => {
   try {
-    let total = await Product.find({}).estimatedDocumentCount().exec();
-    res.status(200).json(total);
+    let total = await Product.find({}).estimatedDocumentCount().exec()
+    res.status(200).json(total)
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-};
+}
 
 exports.productStar = async (req, res) => {
   //first we find product and also use who gave stars
-  const product = await Product.findOne({ _id: req.params.productId }).exec();
+  const product = await Product.findOne({ _id: req.params.productId }).exec()
 
-  console.log(product);
+  console.log(product)
   //we get req.user from authCheck middleware
-  const user = await User.findOne({ email: req.user.email }).exec();
+  const user = await User.findOne({ email: req.user.email }).exec()
 
   //if currently logged in user have already gave ratings then we will update otherwise
   //we will add new rating to the array
 
-  const { star } = req.body;
+  const { star } = req.body
 
   //we can use find methods in the array (i.e product.ratings) to check if current user has already given ratings
   let exisitingRatingObject = product.ratings.find(
     (r) => r.postedBy.toString() === user._id.toString()
-  );
+  )
 
-  console.log("user gave rating", exisitingRatingObject);
+  console.log('user gave rating', exisitingRatingObject)
 
   //if user hasn't given rating then we will push the rating to the rating array
   if (exisitingRatingObject === undefined) {
@@ -167,33 +167,33 @@ exports.productStar = async (req, res) => {
         $push: {
           ratings: {
             star: star,
-            postedBy: user._id,
-          },
-        },
+            postedBy: user._id
+          }
+        }
       },
       {
-        new: true,
+        new: true
       }
-    ).exec();
-    console.log("rating is", ratingAdded);
-    res.status(200).send("Thank you for your review");
+    ).exec()
+    console.log('rating is', ratingAdded)
+    res.status(200).send('Thank you for your review')
   } else {
     //if users want to update rating means if they give ratings again
     const ratingUpdated = await Product.updateOne(
       {
         //here we are searching for object/elemet in ratings array that matches with the exisitingRatingObject
-        ratings: { $elemMatch: exisitingRatingObject },
+        ratings: { $elemMatch: exisitingRatingObject }
       },
       {
         //we only need to update star a nd not touch postedBy or anything
         //so we use special syntax $ to access it
-        $set: { "ratings.$.star": star },
+        $set: { 'ratings.$.star': star }
       },
       {
-        new: true,
+        new: true
       }
-    ).exec();
-    console.log("Updated star rating is", ratingUpdated);
-    res.status(200).json(ratingUpdated);
+    ).exec()
+    console.log('Updated star rating is', ratingUpdated)
+    res.status(200).json(ratingUpdated)
   }
-};
+}
