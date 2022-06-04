@@ -1,0 +1,31 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "dev"  ] || [ "$branch" = "main" ] ;then
+  echo "🚫 You can't commit directly to $branch branch. Please create your own branch and use Pull request instead."
+  exit 127
+fi
+
+echo 'Styling, testing and building your project before committing...'
+
+# npm run format
+
+# Check Prettier standards
+npm run check-format ||
+(
+    echo '🚫 Prettier Check Failed. Run npm run format, add changes and try commit again.';
+    false;
+)
+
+# Check ESLint Standards
+npm run check-lint ||
+(
+        echo '🚫 ESLint Check Failed. Make the required changes listed above, add changes and try to again. Make sure to add the changes again !!'
+        false; 
+)
+
+
+# If everything passes... Now we can commit
+echo 'Commiting the code...'
