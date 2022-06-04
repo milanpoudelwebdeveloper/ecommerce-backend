@@ -29,7 +29,9 @@ app.use(cors())
 // app.use("/api", authRoutes);
 
 //reading all routes synchronously and loading
-fs.readdirSync('./routes').map((r) => app.use('/api', require(`./routes/${r}`)))
+fs.readdirSync('./routes').map((r) =>
+  app.use('/api/', require(`./routes/${r}`))
+)
 
 //port
 
