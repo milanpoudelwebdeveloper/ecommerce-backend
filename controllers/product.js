@@ -211,9 +211,32 @@ const handleQuery = async (req, res, query) => {
   res.json(products)
 }
 
+const handlePrice = async (req, res, price) => {
+  //here $gte means greater
+  //here we are passing price that is array from frontend
+  try {
+    let products = await Product.find({
+      price: {
+        $gte: price[0],
+        $lte: price[1]
+      }
+    })
+      .populate('category')
+      .populate('subs')
+      .exec()
+    res.status(200).json(products)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 exports.searchFilters = async (req, res) => {
-  const { query } = req.body
+  const { query, price } = req.body
   if (query) {
     await handleQuery(req, res, query)
+  }
+  //price will be in the range for eg. [10,50]
+  if (price !== undefined) {
+    await handlePrice(req, res, price)
   }
 }
