@@ -17,6 +17,7 @@ const {
   productsCount,
   productStar
 } = require('../controllers/product')
+const { searchFilters } = require('../controllers/productSearch')
 
 router.post('/product', authCheck, adminCheck, createProduct)
 //we are usong count here to implement pagination and not to send all data at once
@@ -30,5 +31,7 @@ router.post('/products', getProducts)
 
 //for rating
 router.put('/product/star/:productId', authCheck, productStar)
+
+router.post('/search/filters', searchFilters)
 
 module.exports = router

@@ -197,3 +197,45 @@ exports.productStar = async (req, res) => {
     res.status(200).json(ratingUpdated)
   }
 }
+//this handlequery is function that handles searches whether it's a different filter or by any keywords
+
+// const handleQuery = async (req, res, query) => {
+//   console.log(req)
+//   //we have added text:true fields in title and description of product model
+//   //that's why we can query with the text that we sent
+//   const products = await Product.find({ $text: { $search: query }, price: {} }) //this is text based search
+//     .populate('category')
+//     .populate('subs')
+//     .exec()
+//   res.json(products)
+// }
+
+// const handlePrice = async (req, res, price) => {
+//   //here $gte means greater
+//   //here we are passing price that is array from frontend
+//   try {
+//     let products = await Product.find({
+//       price: {
+//         $gte: price[0],
+//         $lte: price[1]
+//       }
+//     })
+//       .populate('category')
+//       .populate('subs')
+//       .exec()
+//     res.status(200).json(products)
+//   } catch (e) {
+//     console.log(e)
+//   }
+// }
+
+// exports.searchFilters = async (req, res) => {
+//   const { query, price } = req.body
+//   if (query) {
+//     await handleQuery(req, res, query)
+//   }
+//   //price will be in the range for eg. [10,50]
+//   if (price !== undefined) {
+//     await handlePrice(req, res, price)
+//   }
+// }
