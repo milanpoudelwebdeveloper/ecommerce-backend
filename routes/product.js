@@ -15,7 +15,8 @@ const {
   listProducts,
   getProducts,
   productsCount,
-  productStar
+  productStar,
+  searchFilters
 } = require('../controllers/product')
 
 router.post('/product', authCheck, adminCheck, createProduct)
@@ -30,5 +31,7 @@ router.post('/products', getProducts)
 
 //for rating
 router.put('/product/star/:productId', authCheck, productStar)
+
+router.post('/search/filters', searchFilters)
 
 module.exports = router

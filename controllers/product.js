@@ -197,3 +197,23 @@ exports.productStar = async (req, res) => {
     res.status(200).json(ratingUpdated)
   }
 }
+//this handlequery is function that handles searches whether it's a different filter or by any keywords
+
+const handleQuery = async (req, res, query) => {
+  console.log(req)
+  console.log(res)
+  //we have added text:true fields in title and description of product model
+  //that's why we can query with the text that we sent
+  const products = await Product.find({ $text: { $search: query } }) //this is text based search
+    .populate('category')
+    .populate('subs')
+    .exec()
+  res.json(products)
+}
+
+exports.searchFilters = async (req, res) => {
+  const { query } = req.body
+  if (query) {
+    await handleQuery(req, res, query)
+  }
+}
