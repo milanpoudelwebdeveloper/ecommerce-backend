@@ -2,7 +2,8 @@ const Product = require('../models/product')
 
 exports.searchFilters = async (req, res) => {
   try {
-    let { searchText, price } = req.body
+    let { searchText, price, selectedCategories } = req.body
+    console.log('check the filters', searchText, selectedCategories)
     let query = {}
 
     if (searchText) {
@@ -16,6 +17,10 @@ exports.searchFilters = async (req, res) => {
         $lte: price[1]
       }
       query = { ...query, price: price }
+    }
+
+    if (selectedCategories.length > 0) {
+      query = { ...query, category: [...selectedCategories] }
     }
 
     const products = await Product.find({ ...query })
