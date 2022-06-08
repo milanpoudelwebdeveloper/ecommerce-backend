@@ -9,7 +9,8 @@ exports.searchFilters = async (req, res) => {
       selectedSubs,
       star,
       selectedShipping,
-      selectedBrand
+      selectedBrand,
+      selectedColor
     } = req.body
     let query = {}
     console.log('hey selected shippings are', selectedShipping)
@@ -44,6 +45,9 @@ exports.searchFilters = async (req, res) => {
     }
     if (selectedBrand) {
       query = { ...query, brand: selectedBrand }
+    }
+    if (selectedColor) {
+      query = { ...query, color: selectedColor }
     }
     const products = await Product.find({ ...query })
       .populate('category')
