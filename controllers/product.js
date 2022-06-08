@@ -138,11 +138,26 @@ exports.productsCount = async (req, res) => {
   }
 }
 
+const updateAverageStarRatings = (productId) => {
+  Product.updateOne({ _id: productId }, [
+    {
+      $addFields: {
+        averageRating: {
+          $floor: { $avg: '$ratings.star' }
+        }
+      }
+    }
+  ]).exec((error, result) => {
+    if (error) {
+      console.log('Error updating fields', error)
+    }
+    console.log(result, 'Succcessfully updated')
+  })
+}
+
 exports.productStar = async (req, res) => {
   //first we find product and also use who gave stars
   const product = await Product.findOne({ _id: req.params.productId }).exec()
-
-  console.log(product)
   //we get req.user from authCheck middleware
   const user = await User.findOne({ email: req.user.email }).exec()
 
@@ -175,6 +190,7 @@ exports.productStar = async (req, res) => {
         new: true
       }
     ).exec()
+    updateAverageStarRatings(product._id)
     console.log('rating is', ratingAdded)
     res.status(200).send('Thank you for your review')
   } else {
@@ -193,10 +209,12 @@ exports.productStar = async (req, res) => {
         new: true
       }
     ).exec()
+    updateAverageStarRatings(product._id)
     console.log('Updated star rating is', ratingUpdated)
     res.status(200).json(ratingUpdated)
   }
 }
+
 //this handlequery is function that handles searches whether it's a different filter or by any keywords
 
 // const handleQuery = async (req, res, query) => {
