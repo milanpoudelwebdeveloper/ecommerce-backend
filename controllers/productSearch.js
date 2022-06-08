@@ -2,9 +2,18 @@ const Product = require('../models/product')
 
 exports.searchFilters = async (req, res) => {
   try {
-    let { searchText, price, selectedCategories } = req.body
-    console.log('check the filters', searchText, selectedCategories)
+    let {
+      searchText,
+      price,
+      selectedCategories,
+      selectedSubs,
+      star,
+      selectedShipping,
+      selectedBrand,
+      selectedColor
+    } = req.body
     let query = {}
+    console.log('hey selected shippings are', selectedShipping)
 
     if (searchText) {
       //full text search
@@ -23,6 +32,23 @@ exports.searchFilters = async (req, res) => {
       query = { ...query, category: [...selectedCategories] }
     }
 
+    if (star > 0) {
+      query = { ...query, averageRating: { $eq: star } }
+    }
+
+    if (selectedSubs.length > 0) {
+      query = { ...query, subs: { $in: selectedSubs } }
+    }
+
+    if (selectedShipping) {
+      query = { ...query, shipping: selectedShipping }
+    }
+    if (selectedBrand) {
+      query = { ...query, brand: selectedBrand }
+    }
+    if (selectedColor) {
+      query = { ...query, color: selectedColor }
+    }
     const products = await Product.find({ ...query })
       .populate('category')
       .populate('subs')
