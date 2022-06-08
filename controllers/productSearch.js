@@ -2,9 +2,9 @@ const Product = require('../models/product')
 
 exports.searchFilters = async (req, res) => {
   try {
-    let { searchText, price, selectedCategories, star } = req.body
+    let { searchText, price, selectedCategories, selectedSubs, star } = req.body
     let query = {}
-    console.log('star is', star)
+    console.log('hey selected subs are', selectedSubs)
 
     if (searchText) {
       //full text search
@@ -25,6 +25,10 @@ exports.searchFilters = async (req, res) => {
 
     if (star > 0) {
       query = { ...query, averageRating: { $eq: star } }
+    }
+
+    if (selectedSubs.length > 0) {
+      query = { ...query, subs: { $in: selectedSubs } }
     }
 
     const products = await Product.find({ ...query })
