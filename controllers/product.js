@@ -4,7 +4,6 @@ const slugify = require('slugify')
 
 exports.createProduct = async (req, res) => {
   try {
-    console.log(req.body)
     //since we are creating slug by ourself from controller, so we are attaching it to req.body so we don't
     //have to send all individual one by one, we have lots of fields coming like price, quantity and lots of
     //so saving req.body is easier
@@ -44,7 +43,7 @@ exports.readProduct = async (req, res) => {
       .populate('category')
       .populate('subs')
       .exec()
-    console.log('Product info', product)
+
     res.status(200).json(product)
   } catch (e) {
     console.log(e)
