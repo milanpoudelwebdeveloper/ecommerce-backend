@@ -15,11 +15,10 @@ exports.createCategory = async (req, res) => {
         .send('Category with this name exists.Please try another name')
       return
     }
-    const category = await new Category({
+    await new Category({
       name: name,
       slug: slugify(name)
     }).save()
-    console.log(category)
     res.status(200).send('Category successfully created')
   } catch (e) {
     console.log(e)
@@ -63,7 +62,7 @@ exports.updateCategory = async (req, res) => {
   const { name } = req.body
   //we will update name and slug both
   try {
-    const updated = await Category.findOneAndUpdate(
+    await Category.findOneAndUpdate(
       { slug: req.params.slug },
       {
         name: name,
@@ -71,7 +70,7 @@ exports.updateCategory = async (req, res) => {
       },
       { new: true }
     )
-    console.log(updated)
+
     res.status(200).send('Successfully updated the category')
   } catch (e) {
     console.log(e)
